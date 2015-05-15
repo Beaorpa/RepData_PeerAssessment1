@@ -1,11 +1,6 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-author: "Beatriz Ortiz"
-date: "16/05/2015"
-output:
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
+Beatriz Ortiz  
+16/05/2015  
 
 ## Introduction 
 
@@ -19,7 +14,8 @@ This assignment makes use of data from a personal activity monitoring device. Th
 ## First steps
 First, I go to load the required libraries, **including Knitr to process the R Markdown document**. I will use **echo = TRUE** so that someone else will be able to read the code. 
 
-```{r}
+
+```r
 library(ggplot2)
 library(knitr)
 opts_chunk$set(echo = TRUE, results = 'hold')
@@ -39,15 +35,24 @@ The variables included in this dataset are:
 
 
 First I will load the csv file and then I will transform the date column into Date format
-```{r}
+
+```r
 activity <- read.csv("activity.csv")
 activity$date <- as.Date(activity$date, "%Y-%m-%d")
 ```
 
 
 Here is now my activity data frame:
-```{r}
+
+```r
 str(activity)
+```
+
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Date, format: "2012-10-01" "2012-10-01" ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
 
@@ -60,31 +65,48 @@ For this part of the assignment, I will ignore the missing values in the dataset
 
 
 Total number of steps per day
-```{r}
+
+```r
 aggr <- aggregate(steps ~ date,  activity, sum)
 head(aggr)
 ```
 
-
-Histogram of the total number of steps taken each day
-```{r, echo=FALSE}
-hist(aggr$steps, breaks=8,  xlab="Number of steps per day",  
-            main="Activity Monitoring - Total number of steps taken each day", 
-            col="orange")
+```
+##         date steps
+## 1 2012-10-02   126
+## 2 2012-10-03 11352
+## 3 2012-10-04 12116
+## 4 2012-10-05 13294
+## 5 2012-10-06 15420
+## 6 2012-10-07 11015
 ```
 
 
+Histogram of the total number of steps taken each day
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+
+
 Now I calculate the mean and median
-```{r}
+
+```r
 aggr_mean <- mean(aggr$steps, na.rm=TRUE)
 ## Mean 
  aggr_mean
 ```
 
-```{r}
+```
+## [1] 10766.19
+```
+
+
+```r
 aggr_median   <- median(aggr$steps, na.rm=TRUE)
 ## Median
 aggr_median
+```
+
+```
+## [1] 10765
 ```
 
 
@@ -96,25 +118,27 @@ aggr_median
 
 
 First, I aggregate steps by 5-minute interval
-```{r}
+
+```r
 averg <- aggregate(x=list(steps=activity$steps), by=list(interval=activity$interval),
                                               FUN=mean, na.rm=TRUE)
 ```
 
 
 Now, Plot with the time series of the interval and steps taken
-```{r, echo=FALSE}
-ggplot(data=averg, aes(color="violet",x=interval, y=steps)) +
-        geom_line() +
-        xlab("5 minute interval") +
-        ylab("Average number of steps taken") + labs(title ="Average Daily Activity Pattern")
-```
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
 
 
 And the interval with the maximun number of steps:
-```{r}
+
+```r
 max_averg <- averg[which.max(averg$steps), ]
 max_averg
+```
+
+```
+##     interval    steps
+## 104      835 206.1698
 ```
 Inteval **835** contains the maximun number of steps ( **206** )
 
@@ -133,14 +157,21 @@ There are a number of days/intervals where there are missing values.
 
 
 Missing values in all the columns of the data frame
-```{r}
+
+```r
 colSums(is.na(activity))
+```
+
+```
+##    steps     date interval 
+##     2304        0        0
 ```
 Only ** step ** column contains NA values. There are ** 2304 ** missing values.
 
 
 Fill NA values in a new data frame equal to the original
-```{r}
+
+```r
 averg_NA <- aggregate(steps ~ interval, data = activity, FUN = mean)
 steps_NA <- numeric()
 rows <- nrow(activity)
@@ -159,42 +190,65 @@ nw_act <-  data.frame(steps = steps_NA , date = activity$date, interval=activity
 
 
 This is the new data frame
-```{r}
+
+```r
 head(nw_act)
-````
+```
 
-
-I have filled all the NA values in steps column
-```{r}
-sum(is.na(nw_act$steps))
-````
-
-
-First I aggregate .... 
-```{r}
-aggr_sim <- aggregate(steps ~ date,  nw_act, sum)
-````
-
-
-Histogram of the total number of steps taken each day
-```{r, echo=FALSE}
-hist(aggr_sim$steps, breaks=8,  xlab="Number of steps per day",  
-            main="Activity Monitoring - Total number of steps taken each day - Fill NA", 
-            col="orange")
+```
+##       steps       date interval
+## 1 1.7169811 2012-10-01        0
+## 2 0.3396226 2012-10-01        5
+## 3 0.1320755 2012-10-01       10
+## 4 0.1509434 2012-10-01       15
+## 5 0.0754717 2012-10-01       20
+## 6 2.0943396 2012-10-01       25
 ```
 
 
+I have filled all the NA values in steps column
+
+```r
+sum(is.na(nw_act$steps))
+```
+
+```
+## [1] 0
+```
+
+
+First I aggregate .... 
+
+```r
+aggr_sim <- aggregate(steps ~ date,  nw_act, sum)
+```
+
+
+Histogram of the total number of steps taken each day
+![](PA1_template_files/figure-html/unnamed-chunk-16-1.png) 
+
+
 Calculate mean and meadian again in new filled-NA data frame
-```{r}
+
+```r
 aggr_sim_mean <- mean(aggr_sim$steps)
 aggr_sim_mean
-````
+```
+
+```
+## [1] 10766.19
+```
 
 
-```{r}
+
+```r
 aggr_sim_mean <- mean(aggr_sim$steps)
 aggr_sim_mean
-````
+```
+
+```
+## [1] 10766.19
+```
 After filled the NA values mean are the same and median are almost the same
 
 **Before filling NA**                    
@@ -213,7 +267,8 @@ For this part I use the weekdays() function
 
 
 First, I add a column called **dia** to the data frame with the days of the week, using weekdays function. Then I create a vector and I add levels ( **weekend** or **weekday**) depending on the value of **dia**. Finally I add the day_week variable as a factor to activity file.
-```{r}
+
+```r
 dia <- weekdays(activity$date)
 day_week <- c()
 for (i in 1:rows) {
@@ -226,20 +281,15 @@ for (i in 1:rows) {
         }
 }
 activity$day_week <- as.factor(day_week)
-````
+```
 
 
 Agregate again but now using Interval and day_week
-```{r}
+
+```r
 aggr_week <- aggregate(steps ~ interval + day_week, data = activity, mean)
-````
+```
 
 
 And now make a panel plot averaged across all weekday days or weekend days.
-```{r, echo=FALSE}
-ggplot(aggr_week, aes(x=interval, y=steps)) + 
-        geom_line(color="violet") + 
-        facet_wrap(~ day_week, nrow=2, ncol=1) +
-        labs(x="Interval", y="Number of steps") +
-        theme_bw()
-```
+![](PA1_template_files/figure-html/unnamed-chunk-21-1.png) 
